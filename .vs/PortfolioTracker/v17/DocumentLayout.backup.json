@@ -10,6 +10,14 @@
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Tomas\\AppData\\Roaming\\Microsoft\\UserSecrets\\portfolio-tracker-secrets\\secrets.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|f:\\vs\\portfoliotracker\\portfoliotracker\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|solutionrelative:portfoliotracker\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|f:\\vs\\portfoliotracker\\portfoliotracker\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|solutionrelative:portfoliotracker\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|f:\\vs\\portfoliotracker\\portfoliotracker\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|solutionrelative:portfoliotracker\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -20,10 +28,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|f:\\vs\\portfoliotracker\\portfoliotracker\\services\\icoinbaseapiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|solutionrelative:portfoliotracker\\services\\icoinbaseapiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|f:\\vs\\portfoliotracker\\portfoliotracker\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|solutionrelative:portfoliotracker\\app.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{DEBF87F8-F07D-417D-9B41-1579BEAD3D68}|PortfolioTracker\\PortfolioTracker.csproj|f:\\vs\\portfoliotracker\\portfoliotracker\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
@@ -37,24 +41,36 @@
       "DocumentGroups": [
         {
           "DockedWidth": 538,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 3,
+              "Title": "App.xaml",
+              "DocumentMoniker": "F:\\VS\\PortfolioTracker\\PortfolioTracker\\App.xaml",
+              "RelativeDocumentMoniker": "PortfolioTracker\\App.xaml",
+              "ToolTip": "F:\\VS\\PortfolioTracker\\PortfolioTracker\\App.xaml",
+              "RelativeToolTip": "PortfolioTracker\\App.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-07-29T17:11:35.943Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "App.xaml.cs",
               "DocumentMoniker": "F:\\VS\\PortfolioTracker\\PortfolioTracker\\App.xaml.cs",
               "RelativeDocumentMoniker": "PortfolioTracker\\App.xaml.cs",
               "ToolTip": "F:\\VS\\PortfolioTracker\\PortfolioTracker\\App.xaml.cs",
               "RelativeToolTip": "PortfolioTracker\\App.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACkAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACUAAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-29T15:46:45.996Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "F:\\VS\\PortfolioTracker\\PortfolioTracker\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "PortfolioTracker\\MainWindow.xaml.cs",
@@ -67,7 +83,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "F:\\VS\\PortfolioTracker\\PortfolioTracker\\MainWindow.xaml",
               "RelativeDocumentMoniker": "PortfolioTracker\\MainWindow.xaml",
@@ -85,7 +101,7 @@
               "RelativeDocumentMoniker": "PortfolioTracker\\Services\\CoinbaseJwtService.cs",
               "ToolTip": "F:\\VS\\PortfolioTracker\\PortfolioTracker\\Services\\CoinbaseJwtService.cs",
               "RelativeToolTip": "PortfolioTracker\\Services\\CoinbaseJwtService.cs",
-              "ViewState": "AgIAACoAAAAAAAAAAAAowE4AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABoAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-29T14:57:10.387Z",
               "EditorCaption": ""
@@ -102,7 +118,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "CoinbaseApiService.cs",
               "DocumentMoniker": "F:\\VS\\PortfolioTracker\\PortfolioTracker\\Services\\CoinbaseApiService.cs",
               "RelativeDocumentMoniker": "PortfolioTracker\\Services\\CoinbaseApiService.cs",
@@ -115,7 +131,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "ICoinbaseApiService.cs",
               "DocumentMoniker": "F:\\VS\\PortfolioTracker\\PortfolioTracker\\Services\\ICoinbaseApiService.cs",
               "RelativeDocumentMoniker": "PortfolioTracker\\Services\\ICoinbaseApiService.cs",
@@ -132,7 +148,7 @@
               "Title": "secrets.json",
               "DocumentMoniker": "C:\\Users\\Tomas\\AppData\\Roaming\\Microsoft\\UserSecrets\\portfolio-tracker-secrets\\secrets.json",
               "ToolTip": "C:\\Users\\Tomas\\AppData\\Roaming\\Microsoft\\UserSecrets\\portfolio-tracker-secrets\\secrets.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAABsAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-07-29T15:43:24.529Z",
               "EditorCaption": ""
