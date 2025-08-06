@@ -27,16 +27,16 @@ namespace PortfolioTracker
             services.AddSingleton<IConfiguration>(configuration);
 
             // Registrujte služby
-            services.AddHttpClient<ICoinbaseApiService, CoinbaseApiService>();
             
-
             services.AddSingleton<CoinbaseJwtService>(provider =>
             {
                 var config = provider.GetService<IConfiguration>();
-                var keyName = config["Coinbase:KeyName"];
-                var privateKey = config["Coinbase:PrivateKey"];
+                var keyName = config["name"];
+                var privateKey = config["privateKey"];
                 return new CoinbaseJwtService(keyName, privateKey);
             });
+
+            services.AddHttpClient<ICoinbaseApiService, CoinbaseApiService>();
 
             _serviceProvider = services.BuildServiceProvider();
 

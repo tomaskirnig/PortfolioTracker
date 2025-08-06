@@ -13,7 +13,8 @@
           "Microsoft.Extensions.DependencyInjection": "9.0.7",
           "Microsoft.Extensions.Http": "9.0.7",
           "Microsoft.IdentityModel.Tokens": "8.13.0",
-          "System.IdentityModel.Tokens.Jwt": "8.13.0"
+          "System.IdentityModel.Tokens.Jwt": "8.13.0",
+          "jose-jwt": "5.2.0"
         },
         "runtime": {
           "PortfolioTracker.dll": {}
@@ -24,6 +25,14 @@
           "lib/netstandard2.0/BouncyCastle.Crypto.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "jose-jwt/5.2.0": {
+        "runtime": {
+          "lib/net6.0/jose-jwt.dll": {
+            "assemblyVersion": "5.2.0.0",
+            "fileVersion": "5.2.0.0"
           }
         }
       },
@@ -370,6 +379,13 @@
       "sha512": "sha512-yfWn8JYPc4rkeM2kcsCqFVFOvwCuuQvIieGtQWcjoWxOioeznXQB3M/GmHgbCWbJjc8ycrwGhZaZPiasifYi4A==",
       "path": "bouncycastle.netcore/2.2.1",
       "hashPath": "bouncycastle.netcore.2.2.1.nupkg.sha512"
+    },
+    "jose-jwt/5.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-wCpQXj+i7qJpS6QC/dlNJM2AtJ0OGL1hbml/Lo0K5JzN1+HtvUVKCP4f9KvcwE9vLLQdaeSPjuRe+LPDja6xsA==",
+      "path": "jose-jwt/5.2.0",
+      "hashPath": "jose-jwt.5.2.0.nupkg.sha512"
     },
     "Microsoft.Extensions.Configuration/9.0.7": {
       "type": "package",

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PortfolioTracker.Services;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
@@ -35,13 +36,16 @@ namespace PortfolioTracker
             {
                 var items = await _coinbaseApiService.GetAccountsAsync();
                 MessageBox.Show(items);
+                Debug.WriteLine(items);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Chyba: {ex.Message}");
+                MessageBox.Show($"Chyba: {ex.Message}, {ex}");
             }
         }
 
+
+        // Gets price of single crypto
         private async Task<string> GetCryptoPrice()
         {
             string cryptoName = "BTC- USD";
