@@ -127,9 +127,9 @@ namespace PortfolioTracker.Services
             var secret = ParseKey(_privateKey);
             var token = GenerateToken(_keyName, secret, uri);
 
-            Debug.WriteLine($"Generated JWT Token: {token}");
-            Debug.WriteLine($"URI: {uri}");
-            Debug.WriteLine($"Key Name: {_keyName}");
+            //Debug.WriteLine($"Generated JWT Token: {token}");
+            //Debug.WriteLine($"URI: {uri}");
+            //Debug.WriteLine($"Key Name: {_keyName}");
 
             return token; 
         }

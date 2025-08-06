@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace PortfolioTracker.Models
 {
-    internal class PortfolioItem
+    public class PortfolioItem
     {
-        public string Name { get; set; }
-        public decimal CurrItemPrice { get; set; }
-        public decimal MyPrice { get; set; }
-        public decimal FinalPrice { get; set; }
+        public string Currency { get; set; } = string.Empty;
+        public string WalletName { get; set; } = string.Empty;
+        public decimal Balance { get; set; }
+        public string BalanceFormatted => $"{Balance:F8} {Currency}";
+        public DateTime LastUpdated { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
     }
 }

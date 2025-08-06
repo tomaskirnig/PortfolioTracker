@@ -1,0 +1,6 @@
+To Do list:
+- get info about coinbase acc
+- Parse the data
+- Display the data
+- Create .exe file
+- Add icon to the .exe file

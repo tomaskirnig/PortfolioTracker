@@ -416,3 +416,14 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Any file containing "secret", "key", or "password" in the name
+*secret*
+*Secret*
+*SECRET*
+*key*
+*Key*
+*KEY*
+*password*
+*Password*
+*PASSWORD*
