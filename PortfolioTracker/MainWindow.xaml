@@ -20,14 +20,19 @@
         </Border>
 
         <Border CornerRadius="15" BorderBrush="Transparent" BorderThickness="2" Grid.Row="1">
-            <DataGrid x:Name="PortfolioDataGrid" AutoGenerateColumns="False" Background="Transparent" CanUserAddRows="False" CanUserDeleteRows="False" Width="700">
+            <DataGrid x:Name="PortfolioDataGrid" 
+                      AutoGenerateColumns="False" 
+                      Background="Transparent" 
+                      CanUserAddRows="False" 
+                      CanUserDeleteRows="False" 
+                      HorizontalAlignment="Stretch"
+                      Margin="10">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" Width="80"/>
-                    <DataGridTextColumn Header="Wallet Name" Binding="{Binding WalletName}" Width="150"/>
-                    <DataGridTextColumn Header="Balance" Binding="{Binding BalanceFormatted}" Width="200"/>
-                    <DataGridTextColumn Header="Last Updated" Binding="{Binding LastUpdated, StringFormat={}{0:yyyy-MM-dd}}" Width="120"/>
-                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80"/>
-                    <DataGridCheckBoxColumn Header="Active" Binding="{Binding IsActive}" Width="60"/>
+                    <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyName}" Width="120"/>
+                    <DataGridTextColumn Header="APY" Binding="{Binding APY}" Width="80"/>
+                    <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" Width="*"/>
+                    <DataGridTextColumn Header="Translated Amount" Binding="{Binding BalanceTranslated}" Width="*"/>
+                    <DataGridTextColumn Header="Target Currency" Binding="{Binding CurrencyTranslated}" Width="100"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>

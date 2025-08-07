@@ -11,7 +11,7 @@ namespace PortfolioTracker.Services
     public interface ICoinbaseApiService
     {
         Task<string> GetAccountsAsync();
-        Task<CoinbaseAccountsResponse> GetAccountsDataAsync();
+        Task<CoinbaseV2Response> GetAccountsDataAsync();
         Task<List<PortfolioItem>> GetPortfolioItemsAsync();
     }
 }
