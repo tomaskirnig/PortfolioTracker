@@ -18,6 +18,7 @@ namespace PortfolioTracker.Services
         private readonly HttpClient _httpClient;
         private readonly CoinbaseJwtService _jwtService;
         private readonly string _translateCurrency = "USD";
+        private readonly string _baseAPIPath = "api.coinbase.com/api/v2/accounts";
 
         public CoinbaseApiService(HttpClient httpClient, CoinbaseJwtService jwtService)
         {
@@ -25,73 +26,127 @@ namespace PortfolioTracker.Services
             _jwtService = jwtService;
         }
 
-        // Gets accounts from Coinbase API (serialized and in JSON format)
-        public async Task<string> GetAccountsAsync()
+        /// <summary>
+        /// This method can be used to call any Coinbase API endpoint.
+        /// It handles JWT authentication, query parameters, and deserialization of the response.
+        /// </summary>
+        /// <typeparam name="T">The type to deserialize the API response into</typeparam>
+        /// <param name="endpoint">Whole API addres.</param>
+        /// <param name="queryParams">Optional query parameters to append to the endpoint (e.g., "?limit=100&idk=123")</param>
+        /// <param name="requiresAuth">Whether the endpoint requires JWT authentication (default is true)</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the deserialized API response of type T</returns>
+        /// <exception cref="HttpRequestException">Thrown when the API call fails</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the response cannot be deserialized</exception>
+        private async Task<T> GetApiResponseAsync<T>(string endpoint, string queryParams = "", bool requiresAuth = true)
         {
-            var basePath = "api/v2/accounts";
-            var endpoint = $"api.coinbase.com/{basePath}";
-            var queryParams = "?limit=100";
-
-            // JWT token must include the full path with query parameters
-            var token = _jwtService.GenerateJwtToken("GET", $"{endpoint}");
-
-            using (var request = new HttpRequestMessage(HttpMethod.Get, $"https://{endpoint}{queryParams}"))
+            try
             {
+                string? token = null;
+                string fullUrl = $"https://{endpoint}{queryParams}";
+
+                // Generate JWT token if authentication is required
+                if (requiresAuth)
+                {
+                    token = _jwtService.GenerateJwtToken("GET", endpoint);
+                }
+
+                using var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
+                
+                // Add authorization header if token is available
                 if (!string.IsNullOrEmpty(token))
+                {
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
 
                 var response = await _httpClient.SendAsync(request);
                 var content = await response.Content.ReadAsStringAsync();
-                
-                MessageBox.Show($"Response Status: {response.StatusCode}", "Coinbase API Response", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                Debug.WriteLine($"API Call: {fullUrl}");
                 Debug.WriteLine($"Response Status: {response.StatusCode}");
-                Debug.WriteLine($"Response Content: {content}");
-                
+
                 if (!response.IsSuccessStatusCode)
                 {
-                    Debug.WriteLine($"Error fetching accounts: {response.ReasonPhrase}");
-                    throw new HttpRequestException($"Error fetching accounts: {response.ReasonPhrase}");
+                    Debug.WriteLine($"Error: {response.ReasonPhrase}");
+                    Debug.WriteLine($"Content: {content}");
+                    throw new HttpRequestException($"API call failed with status {response.StatusCode}: {response.ReasonPhrase}");
                 }
 
-                return content;
-            }
-        }
-
-        // Gets accounts data from Coinbase API (serialized and in CoinbaseV2Response)
-        public async Task<CoinbaseV2Response> GetAccountsDataAsync()
-        {
-            var jsonResponse = await GetAccountsAsync();
-
-            try
-            {
+                // Deserialize JSON to specified type
                 var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 };
 
-                var accountsResponse = JsonSerializer.Deserialize<CoinbaseV2Response>(jsonResponse, options);
-                Debug.WriteLine($"Number of serialized currencies: {accountsResponse.Data.Count}");
-
-                if (accountsResponse == null)
+                var result = JsonSerializer.Deserialize<T>(content, options);
+                
+                if (result == null)
                 {
-                    Debug.WriteLine("Deserialized response is null.");
-                    throw new InvalidOperationException("Failed to deserialize Coinbase API response.");
+                    throw new InvalidOperationException($"Failed to deserialize API response to type {typeof(T).Name}");
                 }
 
-                return accountsResponse ?? throw new InvalidOperationException("Nothing was serialized from API response.");
+                Debug.WriteLine($"Successfully deserialized to {typeof(T).Name}");
+                return result;
             }
             catch (JsonException ex)
             {
                 Debug.WriteLine($"JSON parsing error: {ex.Message}");
-                Debug.WriteLine($"JSON content: {jsonResponse}");
-                throw new InvalidOperationException("Failed to parse Coinbase API response", ex);
+                throw new InvalidOperationException($"Failed to parse API response as {typeof(T).Name}", ex);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"API call error: {ex.Message}");
+                throw;
             }
         }
+
+        private async Task<string> GetApiResponseRawAsync(string endpoint, string queryParams = "", bool requiresAuth = true)
+        {
+            try
+            {
+                string? token = null;
+                string fullUrl = $"https://{endpoint}{queryParams}";
+
+                // Generate JWT token if authentication is required
+                if (requiresAuth)
+                {
+                    token = _jwtService.GenerateJwtToken("GET", endpoint);
+                }
+
+                using var request = new HttpRequestMessage(HttpMethod.Get, fullUrl);
+
+                // Add authorization header if token is available
+                if (!string.IsNullOrEmpty(token))
+                {
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+
+                var response = await _httpClient.SendAsync(request);
+                var content = await response.Content.ReadAsStringAsync();
+
+                Debug.WriteLine($"API Call: {fullUrl}");
+                Debug.WriteLine($"Response Status: {response.StatusCode}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Debug.WriteLine($"Error: {response.ReasonPhrase}");
+                    Debug.WriteLine($"Content: {content}");
+                    throw new HttpRequestException($"API call failed with status {response.StatusCode}: {response.ReasonPhrase}");
+                }
+
+                return content;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"API call error: {ex.Message}");
+                throw;
+            }
+        }
+
 
         // Gets portfolio items from Coinbase API (serialized and in List<PortfolioItem>)
         public async Task<List<PortfolioItem>> GetPortfolioItemsAsync()
         {
-            var accountsResponse = await GetAccountsDataAsync();
+            var accountsResponse = await GetApiResponseAsync<CoinbaseV2Response>(_baseAPIPath, "?limit=100");
             var portfolioItems = new List<PortfolioItem>();
 
             foreach (var account in accountsResponse.Data.Where(a => a.HasBalance))
@@ -108,19 +163,19 @@ namespace PortfolioTracker.Services
 
             portfolioItems = portfolioItems.OrderByDescending(p => p.Balance).ToList();
 
-            portfolioItems = await AddTranslatedCurrency(portfolioItems);
+            portfolioItems = await AddTranslatedCurrencyAsync(portfolioItems);
 
             return portfolioItems;
         }
 
         // Adds translated currency to portfolio items (price per unit in _translateCurrency)
-        private async Task<List<PortfolioItem>> AddTranslatedCurrency(List<PortfolioItem> items)
+        private async Task<List<PortfolioItem>> AddTranslatedCurrencyAsync(List<PortfolioItem> items)
         {
             foreach (var item in items) 
             {
                 try
                 {
-                    var singleCryptoItem = await GetSingleCryptoPrice(item.CurrencyName, _translateCurrency);
+                    var singleCryptoItem = await GetSingleCryptoPriceAsync(item.CurrencyName, _translateCurrency);
                     
                     if (singleCryptoItem?.Data?.Amount != null)
                     {
@@ -152,7 +207,7 @@ namespace PortfolioTracker.Services
         }
 
         // Gets price of single crypto
-        private async Task<SingleCryptoItem> GetSingleCryptoPrice(string cryptoName, string baseCurrrency)
+        private async Task<SingleCryptoItem> GetSingleCryptoPriceAsync(string cryptoName, string baseCurrrency)
         {
             if (string.IsNullOrEmpty(cryptoName)) throw new ArgumentException("Crypto name cannot be null or empty.", nameof(cryptoName));
             if (string.IsNullOrEmpty(baseCurrrency)) throw new ArgumentException("Base currency name cannot be null or empty.", nameof(baseCurrrency));
@@ -188,6 +243,42 @@ namespace PortfolioTracker.Services
                     Debug.WriteLine($"JSON content: {jsonResponse}");
                     throw new InvalidOperationException("Failed to parse Coinbase API response", ex);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets all transactions for a specific cryptocurrency account
+        /// </summary>
+        /// <param name="currency">The currency code (e.g., "BTC", "ETH")</param>
+        /// <returns>The transaction data as JSON string</returns>
+        /// <exception cref="InvalidOperationException">Thrown when transaction retrieval fails</exception>
+        public async Task<string> GetAllTransactionsAsync(string currency)
+        {
+            try
+            {
+                var accountsResponse = await GetApiResponseAsync<CoinbaseV2Response>(_baseAPIPath, "?limit=100");
+                
+                var account = accountsResponse.Data.FirstOrDefault(a => a.Currency.Code.Equals(currency, StringComparison.OrdinalIgnoreCase));
+                
+                if (account == null)
+                {
+                    Debug.WriteLine($"No account found for currency: {currency}");
+                    throw new InvalidOperationException($"No account found for currency: {currency}");
+                }
+                
+                var accountId = account.Id; // This is the UUID needed for the API
+                Debug.WriteLine($"Found account ID for {currency}: {accountId}");
+                
+                var transactionsEndpoint = $"{_baseAPIPath}/562f7025-d33f-5067-96e2-49e1029a5e55/transactions";
+                var response = await GetApiResponseRawAsync(transactionsEndpoint, "?limit=100");
+                
+                Debug.WriteLine($"Successfully retrieved transactions for {currency}");
+                return response;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error retrieving transactions for {currency}: {ex.Message}");
+                throw new InvalidOperationException($"Failed to retrieve transactions for {currency}", ex);
             }
         }
     }

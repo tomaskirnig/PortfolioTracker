@@ -29,12 +29,12 @@ namespace PortfolioTracker
             try
             {
                 // Get parsed portfolio items
-                var portfolioItems = await _coinbaseApiService.GetPortfolioItemsAsync();
+                var portfolioItems = await _coinbaseApiService.GetAllTransactionsAsync("ETH"); // GetPortfolioItemsAsync()
 
-                MessageBox.Show($"Number of items loaded: {portfolioItems.Count}");
+                MessageBox.Show($"Number of items loaded: {portfolioItems}"); //.Count
 
                 // Display in DataGrid
-                PortfolioDataGrid.ItemsSource = portfolioItems;
+                //PortfolioDataGrid.ItemsSource = portfolioItems;
             }
             catch (Exception ex)
             {
