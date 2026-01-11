@@ -103,3 +103,6 @@ E:\VS\PortfolioTracker\PortfolioTracker\obj\Debug\net8.0-windows\Portfoli.864446
 E:\VS\PortfolioTracker\PortfolioTracker\obj\Debug\net8.0-windows\PortfolioTracker.genruntimeconfig.cache
 E:\VS\PortfolioTracker\PortfolioTracker\obj\Debug\net8.0-windows\ref\PortfolioTracker.dll
 E:\VS\PortfolioTracker\PortfolioTracker\bin\Debug\net8.0-windows\jose-jwt.dll
+E:\VS\PortfolioTracker\PortfolioTracker\obj\Debug\net8.0-windows\PortfolioTracker_MarkupCompile.lref
+E:\VS\PortfolioTracker\PortfolioTracker\obj\Debug\net8.0-windows\App.baml
+E:\VS\PortfolioTracker\PortfolioTracker\obj\Debug\net8.0-windows\Themes\ColorPalette.baml

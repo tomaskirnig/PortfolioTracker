@@ -20,12 +20,18 @@ namespace PortfolioTracker.Services
         private readonly string _translateCurrency = "USD";
         private readonly string _baseAPIPath = "api.coinbase.com/api/v2/accounts";
 
+        // Caching fields
+        private List<PortfolioItem>? _cachedPortfolio;
+        private DateTime _lastFetchTime;
+        private const int CacheDurationMinutes = 5;
+
         public CoinbaseApiService(HttpClient httpClient, CoinbaseJwtService jwtService)
         {
             _httpClient = httpClient;
             _jwtService = jwtService;
         }
-
+        
+        // ... (GetApiResponseAsync and GetApiResponseRawAsync methods remain unchanged)
         /// <summary>
         /// This method can be used to call any Coinbase API endpoint.
         /// It handles JWT authentication, query parameters, and deserialization of the response.
@@ -142,67 +148,185 @@ namespace PortfolioTracker.Services
             }
         }
 
-
         // Gets portfolio items from Coinbase API (serialized and in List<PortfolioItem>)
-        public async Task<List<PortfolioItem>> GetPortfolioItemsAsync()
+        public async Task<List<PortfolioItem>> GetPortfolioItemsAsync(bool forceRefresh = false)
         {
-            var accountsResponse = await GetApiResponseAsync<CoinbaseV2Response>(_baseAPIPath, "?limit=100");
-            var portfolioItems = new List<PortfolioItem>();
-
-            foreach (var account in accountsResponse.Data.Where(a => a.HasBalance))
+            // Check cache validity
+            if (!forceRefresh && _cachedPortfolio != null && DateTime.Now < _lastFetchTime.AddMinutes(CacheDurationMinutes))
             {
-                portfolioItems.Add(new PortfolioItem
+                Debug.WriteLine("Returning cached portfolio data.");
+                return _cachedPortfolio;
+            }
+
+            Debug.WriteLine("Fetching new portfolio data from API...");
+            var accountsResponse = await GetApiResponseAsync<CoinbaseV2Response>(_baseAPIPath, "?limit=100");
+            var rawItems = new List<PortfolioItem>();
+
+            // 1. Collect ALL accounts (no filtering by HasBalance yet)
+            foreach (var account in accountsResponse.Data)
+            {
+                rawItems.Add(new PortfolioItem
                 {
                     CurrencyName = account.Currency.Code,
                     Balance = account.BalanceValue,
-                    APY = account.Currency.Rewards?.FormattedApy ?? "N/A",
-                    BalanceTranslated = null,           // THE PRICE HAS TO BE CALCULATED SEPARATELY (ANOTHER API CALL)
+                    APY = account.Currency.Rewards?.FormattedApy ?? "N/A", // Note: APY might differ per account, taking last/first found
+                    BalanceTranslated = null,
                     CurrencyTranslated = _translateCurrency 
                 });
             }
 
-            portfolioItems = portfolioItems.OrderByDescending(p => p.Balance).ToList();
+            // 2. Group by Currency Code and Sum Balances
+            var groupedItems = rawItems
+                .GroupBy(i => i.CurrencyName)
+                .Select(g => new PortfolioItem
+                {
+                    CurrencyName = g.Key,
+                    Balance = g.Sum(x => x.Balance),
+                    // For APY, we'll take the first one that isn't "N/A", or default to "N/A"
+                    APY = g.FirstOrDefault(x => x.APY != "N/A")?.APY ?? "N/A",
+                    CurrencyTranslated = _translateCurrency,
+                    BalanceTranslated = null
+                })
+                .Where(i => i.Balance > 0 || string.Equals(i.CurrencyName, "BTC", StringComparison.OrdinalIgnoreCase)) // Keep positive balance OR BTC
+                .ToList();
 
-            portfolioItems = await AddTranslatedCurrencyAsync(portfolioItems);
+            // 3. If BTC is still missing (0 balance and wasn't in API at all), add fallback
+            if (!groupedItems.Any(p => string.Equals(p.CurrencyName, "BTC", StringComparison.OrdinalIgnoreCase)))
+            {
+                Debug.WriteLine("[DEBUG] Manually adding fallback BTC account.");
+                groupedItems.Add(new PortfolioItem
+                {
+                    CurrencyName = "BTC",
+                    Balance = 0,
+                    APY = "N/A",
+                    BalanceTranslated = null,
+                    CurrencyTranslated = _translateCurrency
+                });
+            }
 
-            return portfolioItems;
+            // 4. Calculate prices AND fetch invested amounts for the aggregated list
+            // We can do price fetching and transaction fetching in parallel for each item
+            var tasks = groupedItems.Select(async item =>
+            {
+                // Task 1: Get Price/Value
+                try
+                {
+                    var singleCryptoItem = await GetSingleCryptoPriceAsync(item.CurrencyName, _translateCurrency);
+                    if (decimal.TryParse(singleCryptoItem.Data.Amount, NumberStyles.Number, CultureInfo.InvariantCulture, out var pricePerUnit))
+                    {
+                        item.BalanceTranslated = pricePerUnit * item.Balance;
+                    }
+                }
+                catch { /* Ignore price errors */ }
+
+                // Task 2: Get Invested Amount (only if we have accounts for this currency)
+                // We need to find the Account IDs associated with this currency from the original 'accountsResponse'
+                // But we lost them in the GroupBy. We should look them up again.
+                var accountIds = accountsResponse.Data
+                    .Where(a => a.Currency.Code == item.CurrencyName)
+                    .Select(a => a.Id)
+                    .ToList();
+
+                decimal? totalInvested = null; // Changed to nullable
+                foreach (var accountId in accountIds)
+                {
+                    try 
+                    {
+                        var invested = await GetAccountInvestedAmountAsync(accountId);
+                        if (invested != null)
+                        {
+                            totalInvested = (totalInvested ?? 0) + invested;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Failed to get transactions for account {accountId}: {ex.Message}");
+                    }
+                }
+                item.Invested = totalInvested ?? 0; // Default to 0 if null, or keep null if you want UI to show differently
+
+                return item;
+            });
+
+            await Task.WhenAll(tasks);
+
+            // 5. Sort: BTC first, then by Value
+            groupedItems = groupedItems
+                .OrderByDescending(p => string.Equals(p.CurrencyName, "BTC", StringComparison.OrdinalIgnoreCase))
+                .ThenByDescending(p => p.BalanceTranslated ?? 0)
+                .ToList();
+
+            // Update cache
+            _cachedPortfolio = groupedItems;
+            _lastFetchTime = DateTime.Now;
+
+            return groupedItems;
+        }
+
+        // Helper to get invested amount for a single account ID
+        private async Task<decimal?> GetAccountInvestedAmountAsync(string accountId)
+        {
+            decimal invested = 0;
+            
+            // Initial call
+            var currentEndpoint = $"{_baseAPIPath}/{accountId}/transactions";
+            var currentQueryParams = "?limit=100";
+            bool hasMorePages = true;
+
+            while (hasMorePages)
+            {
+                CoinbaseV2TransactionResponse response;
+                try 
+                {
+                    response = await GetApiResponseAsync<CoinbaseV2TransactionResponse>(currentEndpoint, currentQueryParams);
+                }
+                catch (HttpRequestException ex) when (ex.Message.Contains("NotFound") || ex.Message.Contains("404"))
+                {
+                    Debug.WriteLine($"[WARN] Transactions endpoint not found for account {accountId}. Check API Key permissions (wallet:transactions:read).");
+                    return null; // Signal that we couldn't fetch data
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error fetching transactions page: {ex.Message}");
+                    return null; 
+                }
+
+                foreach (var tx in response.Data)
+                {
+                    if (decimal.TryParse(tx.NativeAmount.Amount, NumberStyles.Number, CultureInfo.InvariantCulture, out var amount))
+                    {
+                        if (string.Equals(tx.Type, "buy", StringComparison.OrdinalIgnoreCase))
+                        {
+                            invested += amount;
+                        }
+                        else if (string.Equals(tx.Type, "sell", StringComparison.OrdinalIgnoreCase))
+                        {
+                            invested -= amount; 
+                        }
+                    }
+                }
+
+                // Check for next page
+                if (response.Pagination != null && !string.IsNullOrEmpty(response.Pagination.NextUri))
+                {
+                    currentEndpoint = "api.coinbase.com" + response.Pagination.NextUri;
+                    currentQueryParams = ""; 
+                    await Task.Delay(100); 
+                }
+                else
+                {
+                    hasMorePages = false;
+                }
+            }
+            
+            return invested;
         }
 
         // Adds translated currency to portfolio items (price per unit in _translateCurrency)
         private async Task<List<PortfolioItem>> AddTranslatedCurrencyAsync(List<PortfolioItem> items)
         {
-            foreach (var item in items) 
-            {
-                try
-                {
-                    var singleCryptoItem = await GetSingleCryptoPriceAsync(item.CurrencyName, _translateCurrency);
-                    
-                    if (singleCryptoItem?.Data?.Amount != null)
-                    {
-                        if (decimal.TryParse(singleCryptoItem.Data.Amount, NumberStyles.Number, CultureInfo.InvariantCulture, out var pricePerUnit))
-                        {
-                            item.BalanceTranslated = pricePerUnit * item.Balance;
-                            Debug.WriteLine($"{item.CurrencyName}: {item.Balance} × ${pricePerUnit} = ${item.BalanceTranslated:F2}");
-                        }
-                        else
-                        {
-                            Debug.WriteLine($"Failed to parse price for {item.CurrencyName}: '{singleCryptoItem.Data.Amount}'");
-                            item.BalanceTranslated = null;
-                        }
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"No price data available for {item.CurrencyName}");
-                        item.BalanceTranslated = null;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error getting price for {item.CurrencyName}: {ex.Message}");
-                    item.BalanceTranslated = null;
-                }
-            }
-            
+            // This method is now effectively replaced by the parallel block above, 
+            // but kept if needed by other logic, though currently unused in the new flow.
             return items; 
         }
 
@@ -269,7 +393,7 @@ namespace PortfolioTracker.Services
                 var accountId = account.Id; // This is the UUID needed for the API
                 Debug.WriteLine($"Found account ID for {currency}: {accountId}");
                 
-                var transactionsEndpoint = $"{_baseAPIPath}/562f7025-d33f-5067-96e2-49e1029a5e55/transactions";
+                var transactionsEndpoint = $"{_baseAPIPath}/{accountId}/transactions";
                 var response = await GetApiResponseRawAsync(transactionsEndpoint, "?limit=100");
                 
                 Debug.WriteLine($"Successfully retrieved transactions for {currency}");

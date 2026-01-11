@@ -3,38 +3,72 @@
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
-        mc:Ignorable="d"  
-       Title="Portfolio Tracker" Height="450" Width="800"  
-       Background="#0a0b0d">  
-   <Grid>
+       mc:Ignorable="d"  
+       Title="Portfolio Tracker" Height="800" Width="1200"
+       WindowStartupLocation="CenterScreen"
+       Background="{StaticResource BackgroundBrush}">
+    
+    <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" /> <!-- Header -->
+            <RowDefinition Height="250" />  <!-- Chart -->
+            <RowDefinition Height="*" />    <!-- List -->
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
 
-        <Border CornerRadius="15" BorderBrush="Transparent" BorderThickness="2" Grid.Row="0">
-            <Canvas x:Name="chartCanvas" Background="White" Margin="30,2,30,2"/>
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <StackPanel HorizontalAlignment="Left">
+                <TextBlock Text="My Portfolio" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+                <TextBlock Text="Overview of your crypto assets" FontSize="14" Foreground="{StaticResource SubTextBrush}" Margin="0,5,0,0"/>
+            </StackPanel>
+            
+            <Button x:Name="RefreshButton" Content="Refresh Data" HorizontalAlignment="Right" VerticalAlignment="Center"
+                    Padding="15,8" Background="{StaticResource SurfaceBrush}" Foreground="{StaticResource PrimaryBrush}"
+                    BorderThickness="0" FontWeight="Bold" Cursor="Hand"
+                    Click="Refresh_Click">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="6"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </Grid>
+
+        <!-- Chart Section -->
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+            <Grid>
+                <TextBlock Text="Performance Chart" VerticalAlignment="Top" HorizontalAlignment="Left" 
+                           Foreground="{StaticResource SurfaceTextBrush}" FontWeight="SemiBold"/>
+                <Canvas x:Name="chartCanvas" Background="Transparent" Margin="0,30,0,0">
+                    <!-- Placeholder for Chart -->
+                    <TextBlock Canvas.Left="400" Canvas.Top="80" Text="No chart data available" 
+                               Foreground="#888" FontStyle="Italic"/>
+                </Canvas>
+            </Grid>
         </Border>
 
-        <Border CornerRadius="15" BorderBrush="Transparent" BorderThickness="2" Grid.Row="1">
-            <DataGrid x:Name="PortfolioDataGrid" 
-                      AutoGenerateColumns="False" 
-                      Background="Transparent" 
-                      CanUserAddRows="False" 
-                      CanUserDeleteRows="False" 
-                      HorizontalAlignment="Stretch"
-                      Margin="10">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyName}" Width="120"/>
-                    <DataGridTextColumn Header="APY" Binding="{Binding APY}" Width="80"/>
-                    <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" Width="*"/>
-                    <DataGridTextColumn Header="Translated Amount" Binding="{Binding BalanceTranslated}" Width="*"/>
-                    <DataGridTextColumn Header="Target Currency" Binding="{Binding CurrencyTranslated}" Width="100"/>
-                </DataGrid.Columns>
-            </DataGrid>
+        <!-- Assets List Section -->
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Row="0" Text="Assets" VerticalAlignment="Top" HorizontalAlignment="Left" 
+                           Foreground="{StaticResource SurfaceTextBrush}" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+                <DataGrid x:Name="PortfolioDataGrid" Grid.Row="1" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyName}" Width="150" FontWeight="Bold"/>
+                        <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" Width="*"/>
+                        <DataGridTextColumn Header="Invested" Binding="{Binding Invested, StringFormat=N2}" Width="*"/>
+                        <DataGridTextColumn Header="Value (Target)" Binding="{Binding BalanceTranslated, StringFormat=N2}" Width="*"/>
+                        <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyTranslated}" Width="100"/>
+                        <DataGridTextColumn Header="APY" Binding="{Binding APY}" Width="100"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
         </Border>
     </Grid>  
 </Window>

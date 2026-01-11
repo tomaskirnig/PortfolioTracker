@@ -1,0 +1,37 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- New Palette -->
+    <Color x:Key="DustyMauveColor">#9e788f</Color>
+    <Color x:Key="PowderBlueColor">#a9b3ce</Color>
+    <Color x:Key="PearlAquaColor">#7cdedc</Color>
+    <Color x:Key="GlaucousColor">#7284a8</Color>
+    <Color x:Key="CharcoalBlueColor">#474954</Color>
+
+    <!-- Semantic Mapping -->
+    
+    <!-- Window Background -> Charcoal Blue (Darkest) -->
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource CharcoalBlueColor}"/>
+    
+    <!-- Cards/Tables Background -> Glaucous (Lighter than background) -->
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource GlaucousColor}"/>
+    
+    <!-- Text (Primary on Background) -> Pearl Aqua (High contrast light) -->
+    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource PearlAquaColor}"/>
+    
+    <!-- Text (On Surface/Cards) -> Pearl Aqua (Light text for transparent/dark backgrounds) -->
+    <SolidColorBrush x:Key="SurfaceTextBrush" Color="{StaticResource PearlAquaColor}"/>
+    
+    <!-- Subtext -> Powder Blue -->
+    <SolidColorBrush x:Key="SubTextBrush" Color="{StaticResource PowderBlueColor}"/>
+
+    <!-- Primary Accents -> Pearl Aqua -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PearlAquaColor}"/>
+    
+    <!-- Secondary Accents (Selection) -> Dusty Mauve -->
+    <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource DustyMauveColor}"/>
+    
+    <!-- Grid Lines -> Charcoal Blue (Subtle on Glaucous) -->
+    <SolidColorBrush x:Key="GridLineBrush" Color="{StaticResource CharcoalBlueColor}" Opacity="0.3"/>
+
+</ResourceDictionary>

@@ -4,6 +4,87 @@
              xmlns:local="clr-namespace:PortfolioTracker"
              ><!--StartupUri="MainWindow.xaml">-->
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/ColorPalette.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Styles -->
+            <Style TargetType="Window">
+                <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                <Setter Property="FontFamily" Value="Segoe UI"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            </Style>
+
+            <Style TargetType="Border" x:Key="CardStyle">
+                <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                <Setter Property="CornerRadius" Value="8"/>
+                <Setter Property="Padding" Value="15"/>
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect Color="Black" Opacity="0.5" BlurRadius="15" ShadowDepth="4"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- DataGrid Style -->
+            <Style TargetType="DataGrid">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{StaticResource SurfaceTextBrush}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="RowBackground" Value="Transparent"/>
+                <Setter Property="AlternatingRowBackground" Value="Transparent"/>
+                <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+                <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource GridLineBrush}"/>
+                <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
+                <Setter Property="HeadersVisibility" Value="Column"/>
+                <Setter Property="AutoGenerateColumns" Value="False"/>
+                <Setter Property="CanUserAddRows" Value="False"/>
+                <Setter Property="CanUserDeleteRows" Value="False"/>
+                <Setter Property="CanUserResizeRows" Value="False"/>
+                <Setter Property="RowHeaderWidth" Value="0"/>
+                <Setter Property="ColumnHeaderHeight" Value="40"/>
+                <Setter Property="RowHeight" Value="35"/>
+            </Style>
+
+            <Style TargetType="DataGridColumnHeader">
+                <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/> <!-- Darker Header -->
+                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/> <!-- Amber Gold Header Text -->
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                <Setter Property="BorderBrush" Value="{StaticResource GridLineBrush}"/>
+                <Setter Property="Padding" Value="10,0"/>
+                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            </Style>
+
+            <Style TargetType="DataGridCell">
+                <Setter Property="Padding" Value="10,0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="DataGridCell">
+                            <Border Padding="{TemplateBinding Padding}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                Background="{TemplateBinding Background}" 
+                                SnapsToDevicePixels="True">
+                                <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/> <!-- Spicy Orange Selection -->
+                        <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
